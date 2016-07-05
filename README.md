@@ -1,18 +1,55 @@
 # wdio-coherent-reporter
 A WebdriverIO plugin.  Outputs success and failure information for suites and tests, which may be running in parallel, on a per-suite basis, at the completion of the suite.
 
-`wdio-coherent-reporter` is compatible with WDIO v4.
+```
+Magic number computer, running on chrome
+  ✓ can add two numbers (10ms)
+  ✓ can subtract two numbers (9ms)
+  ✓ can multiply two numbers (12ms)
 
-`wdio-coherent-reporter` builds on top of functionality presented in the standard `wdio-spec-reporter` plugin, by also allowing a test writer to write messages which will be written to the console inline with suite and test progress messages.  The test writer can send an object with a property `event` set to `coherent:message`, with a property `message`, and this will be reported after the test name, and before the completion message.
+Magic number computer, running on firefox
+  ✓ can add two numbers (10ms)
+  ✖ can subtract two numbers (3096ms)
+  Error: Timeout - Async callback was not invoked within timeout specified by jasmine.DEFAULT_TIMEOUT_INTERVAL.
+    at Timeout._onTimeout (~/Projects/magicComputer/node_modules/jasmine-core/lib/jasmine-core/jasmine.js:1812:23)
+    at tryOnTimeout (timers.js:224:11)
+    at Timer.listOnTimeout (timers.js:198:5)
+
+  ✓ can multiply two numbers (13ms)
+```
+
+`wdio-coherent-reporter` is compatible with [WDIO](https://github.com/webdriverio/webdriverio) version 4.
+
+## Installation
+
+The easiest way is to keep wdio-coherent-reporter as a devDependency in your package.json.
 
 ```
-describe('Magic number computer')
+{
+  "devDependencies": {
+    "wdio-coherent-reporter": "~1.0.1"
+  }
+}
+```
+You can simple do it by:
+```
+npm install wdio-coherent-reporter --save-dev
+```
+Instructions on how to install WebdriverIO can be found [here](http://webdriver.io/guide/getstarted/install.html).
+
+## Usage
+
+`wdio-coherent-reporter` builds on top of ideas presented in the standard [`wdio-spec-reporter`](https://github.com/webdriverio/wdio-spec-reporter) plugin, by also allowing a test writer to write messages which will be written to the console inline with suite and test progress messages.  The test writer can send an object with a property `event` set to `coherent:message`, with a property `message`, and this will be reported after the test name, and before the completion message.
+
+```
+describe('Magic number computer', function() {
   it('can add two numbers', function() {
     const a = 3;
     const b = 4;
     process.send({ event: 'coherent:message', message: 'About to add two numbers...', currentSuite, currentTest });
     expect(computer.add(a, b)).toBe(7);
   });
+});
 ```
 
 ```
@@ -72,13 +109,14 @@ exports.config = {
 When the `formatMessage` method is provided, the call to `process.send` may include other properties, which can be used in the method body to create a custom log string:
 
 ```
-describe('Magic number computer')
+describe('Magic number computer', function() {
   it('can add two numbers', function() {
     const a = 3;
     const b = 4;
     process.send({ event: 'coherent:message', message: 'About to add two numbers...', currentSuite, currentTest, datastamp: (new Date()).toISOString(), level: 'info' });
     expect(computer.add(a, b)).toBe(7);
   });
+});
 ```
 
 ```
@@ -135,11 +173,12 @@ function logAtLevel(level, args) {
 ```
 import { info } from 'logger.js';
 
-describe('Magic number computer')
+describe('Magic number computer', function() {
   it('can add two numbers', function() {
     const a = 3;
     const b = 4;
     info('About to add two numbers...');
     expect(computer.add(a, b)).toBe(7);
   });
+});
 ```
