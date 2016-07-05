@@ -86,3 +86,60 @@ Magic number computer, running on chrome
   2016-07-05T19:03:51.321Z info: About to add two numbers...
   ✓ can add two numbers (10ms)
 ```
+
+This rapidly becomes unweildy for common use across tests, so a logging class might be introduced for some of the heavy lifting:
+
+```
+import { red, yellow, cyan, bold } from 'chalk';
+
+let currentSuite = null,
+  currentTest = null;
+
+process.on('suite:start', (suite) => {
+  currentSuite = suite[0];
+});
+
+process.on('test:start', (test) => {
+  currentTest = test[0];
+});
+
+process.on('test:end', (test) => {
+  currentTest = null;
+});
+
+process.on('suite:end', (runner) => {
+  currentSuite = null;
+});
+
+export function info(message) {
+  logAtLevel('info', message);
+}
+
+export function failure(message) {
+  logAtLevel('error', message);
+}
+
+function logAtLevel(level, args) {
+  const m = {
+    event: 'coherent:message',
+    datestamp: new Date().toTimeString(),
+    currentSuite,
+    currentTest,
+    level,
+    message
+  };
+  process.send(m);
+}
+```
+
+```
+import { info } from 'logger.js';
+
+describe('Magic number computer')
+  it('can add two numbers', function() {
+    const a = 3;
+    const b = 4;
+    info('About to add two numbers...');
+    expect(computer.add(a, b)).toBe(7);
+  });
+```
