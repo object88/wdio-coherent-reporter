@@ -1,6 +1,6 @@
 {
   "name": "wdio-coherent-reporter",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "",
   "main": "build/reporter.js",
   "directories": {
